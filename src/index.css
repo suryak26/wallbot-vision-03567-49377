@@ -1,0 +1,161 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Dark tech theme - futuristic robotics interface */
+    --background: 220 20% 8%;
+    --foreground: 210 40% 98%;
+
+    --card: 220 18% 12%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 220 20% 10%;
+    --popover-foreground: 210 40% 98%;
+
+    /* Electric cyan/blue primary */
+    --primary: 190 95% 55%;
+    --primary-foreground: 220 20% 8%;
+    --primary-glow: 190 100% 65%;
+
+    /* Darker secondary for cards */
+    --secondary: 220 16% 16%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 220 15% 20%;
+    --muted-foreground: 215 15% 65%;
+
+    /* Purple accent for highlights */
+    --accent: 265 80% 60%;
+    --accent-foreground: 210 40% 98%;
+
+    /* Amber/orange for warnings */
+    --warning: 30 95% 55%;
+    --warning-foreground: 220 20% 8%;
+
+    /* Green for success */
+    --success: 142 70% 50%;
+    --success-foreground: 220 20% 8%;
+
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 220 15% 22%;
+    --input: 220 15% 18%;
+    --ring: 190 95% 55%;
+
+    --radius: 0.75rem;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(190 95% 55%), hsl(265 80% 60%));
+    --gradient-hero: linear-gradient(180deg, hsl(220 20% 8%), hsl(220 18% 12%));
+    --gradient-card: linear-gradient(135deg, hsl(220 18% 12% / 0.6), hsl(220 16% 16% / 0.8));
+    --gradient-glow: radial-gradient(circle at 50% 0%, hsl(190 95% 55% / 0.15), transparent 70%);
+
+    /* Shadows with glow effects */
+    --shadow-sm: 0 2px 8px hsl(220 20% 5% / 0.3);
+    --shadow-md: 0 4px 16px hsl(220 20% 5% / 0.4);
+    --shadow-lg: 0 8px 32px hsl(220 20% 5% / 0.5);
+    --shadow-glow: 0 0 32px hsl(190 95% 55% / 0.3);
+    --shadow-glow-hover: 0 0 48px hsl(190 95% 55% / 0.5);
+
+    /* Transitions */
+    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-background;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary;
+  }
+}
+
+@layer components {
+  /* Glass effect for cards */
+  .glass-card {
+    background: linear-gradient(135deg, 
+      hsl(var(--card) / 0.6), 
+      hsl(var(--secondary) / 0.8)
+    );
+    backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--border) / 0.5);
+  }
+
+  /* Glow effect on hover */
+  .glow-on-hover {
+    transition: var(--transition-base);
+  }
+
+  .glow-on-hover:hover {
+    box-shadow: var(--shadow-glow-hover);
+    transform: translateY(-2px);
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Status indicators */
+  .status-dot {
+    @apply w-2 h-2 rounded-full;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .status-online {
+    @apply bg-success;
+    box-shadow: 0 0 8px hsl(var(--success) / 0.5);
+  }
+
+  .status-warning {
+    @apply bg-warning;
+    box-shadow: 0 0 8px hsl(var(--warning) / 0.5);
+  }
+
+  .status-offline {
+    @apply bg-destructive;
+    box-shadow: 0 0 8px hsl(var(--destructive) / 0.5);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
