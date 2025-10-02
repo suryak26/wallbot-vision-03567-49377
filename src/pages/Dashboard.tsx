@@ -49,13 +49,51 @@ const Dashboard = () => {
   >([]);
   const [runtime, setRuntime] = useState(0);
   
-  // Mock sensor data (replace with real data from ThingSpeak/Blynk)
-  const [sensorData] = useState({
+  // Real-time sensor data from ThingSpeak
+  const [sensorData, setSensorData] = useState({
     dht11: { temp: 28.4, humidity: 56 },
     mq2: 120,
     mq135: 180,
-    irSensor: { detections: 7, lastDetection: "2 min ago", active: true }
+    irSensor: { detections: 0, lastDetection: "Never", active: false }
   });
+
+  const THINGSPEAK_API_KEY = "43Y8P5M6TK5G6QVZ";
+  const THINGSPEAK_CHANNEL_URL = `https://api.thingspeak.com/channels/2793914/feeds.json?api_key=${THINGSPEAK_API_KEY}&results=1`;
+
+  // Fetch sensor data from ThingSpeak
+  useEffect(() => {
+    const fetchSensorData = async () => {
+      try {
+        const response = await fetch(THINGSPEAK_CHANNEL_URL);
+        const data = await response.json();
+        
+        if (data.feeds && data.feeds.length > 0) {
+          const latestFeed = data.feeds[0];
+          
+          setSensorData(prev => ({
+            ...prev,
+            mq2: parseFloat(latestFeed.field1) || prev.mq2,
+            irSensor: {
+              detections: parseInt(latestFeed.field2) || prev.irSensor.detections,
+              lastDetection: latestFeed.field2 > 0 ? "Just now" : prev.irSensor.lastDetection,
+              active: parseInt(latestFeed.field2) > 0
+            }
+          }));
+        }
+      } catch (error) {
+        console.error("Error fetching ThingSpeak data:", error);
+        toast.error("Failed to fetch sensor data");
+      }
+    };
+
+    // Fetch immediately
+    fetchSensorData();
+
+    // Poll every 15 seconds for real-time updates
+    const interval = setInterval(fetchSensorData, 15000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   const [quickStats] = useState({
     totalDistance: 124.5,
