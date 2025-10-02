@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Users } from "lucide-react";
+import teamPhoto from "@/assets/team-photo.jpg";
 
 export const Story = () => {
   const teamMembers = [
@@ -34,12 +34,13 @@ export const Story = () => {
               </p>
             </div>
 
-            {/* Team photo placeholder */}
-            <div className="bg-muted/30 rounded-xl p-8 border border-dashed border-border">
-              <div className="flex items-center justify-center gap-3 text-muted-foreground">
-                <Users className="w-6 h-6" />
-                <p className="text-sm italic">Team photo placeholder - Add your team image here</p>
-              </div>
+            {/* Team photo */}
+            <div className="rounded-xl overflow-hidden border border-border">
+              <img 
+                src={teamPhoto} 
+                alt="S4V-WallBot team members - Surya, Sakthi, Sanjana, Sudesh, and Vickkraman"
+                className="w-full h-auto object-cover"
+              />
             </div>
 
             {/* Team roles */}

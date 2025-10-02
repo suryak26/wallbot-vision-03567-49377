@@ -82,24 +82,9 @@ export const Evolution = () => {
                     <p className="text-sm text-muted-foreground">{stage.description}</p>
                   </div>
 
-                  <div className="bg-muted/30 rounded-lg p-3 border border-dashed border-border">
-                    <p className="text-xs text-muted-foreground text-center italic">
-                      3D model thumbnail
-                    </p>
-                  </div>
-
                   <p className="text-xs text-muted-foreground leading-relaxed">
                     {stage.details}
                   </p>
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full"
-                    onClick={() => navigate("/explore")}
-                  >
-                    View 3D Model
-                  </Button>
                 </Card>
               </div>
             ))}

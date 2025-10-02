@@ -4,6 +4,7 @@ import { Story } from "@/components/Story";
 import { Applications } from "@/components/Applications";
 import { Evolution } from "@/components/Evolution";
 import Future from "@/components/Future";
+import prototypeImage from "@/assets/prototype.jpg";
 
 const Index = () => {
   return (
@@ -55,24 +56,38 @@ const Index = () => {
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {[
-              { label: "Video Demo 1", type: "mp4" },
-              { label: "Video Demo 2", type: "mp4" },
-              { label: "Prototype Image", type: "jpg" }
-            ].map((slot, index) => (
-              <div
-                key={slot.label}
-                className="glass-card p-8 rounded-xl aspect-video flex flex-col items-center justify-center gap-4 border-dashed animate-fade-in-up"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <p className="text-sm text-muted-foreground text-center italic">
-                  {slot.label}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Add {slot.type} file here
-                </p>
-              </div>
-            ))}
+            {/* Video Demo 1 */}
+            <div className="glass-card rounded-xl overflow-hidden animate-fade-in-up">
+              <iframe
+                className="w-full aspect-video"
+                src="https://www.youtube.com/embed/f2IuJB1TeoM"
+                title="S4V-WallBot Demo Video 1"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+
+            {/* Video Demo 2 */}
+            <div className="glass-card rounded-xl overflow-hidden animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
+              <iframe
+                className="w-full aspect-video"
+                src="https://www.youtube.com/embed/lLUNttXNDd4"
+                title="S4V-WallBot Demo Video 2"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+
+            {/* Prototype Image */}
+            <div className="glass-card rounded-xl overflow-hidden animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
+              <img
+                src={prototypeImage}
+                alt="S4V-WallBot Prototype"
+                className="w-full h-full object-cover"
+              />
+            </div>
           </div>
         </div>
       </section>

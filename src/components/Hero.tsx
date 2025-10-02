@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Bot, Gamepad2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import heroImage from "@/assets/hero-robot.jpg";
+import heroImage from "@/assets/hero-robot-new.jpg";
 
 export const Hero = () => {
   const navigate = useNavigate();
