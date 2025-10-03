@@ -28,7 +28,9 @@ import {
   Radio,
   Signal,
   Waves,
-  Eye
+  Eye,
+  ShieldAlert,
+  Info
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -57,8 +59,17 @@ const Dashboard = () => {
     irSensor: { detections: 0, lastDetection: "Never", active: false }
   });
 
+  // Alerts state
+  const [alerts, setAlerts] = useState<Array<{
+    id: string;
+    type: 'critical' | 'caution' | 'normal';
+    sensor: string;
+    message: string;
+    timestamp: string;
+  }>>([]);
+
   const THINGSPEAK_API_KEY = "43Y8P5M6TK5G6QVZ";
-  const THINGSPEAK_CHANNEL_URL = `https://api.thingspeak.com/channels/2793914/feeds.json?api_key=${THINGSPEAK_API_KEY}&results=1`;
+  const THINGSPEAK_CHANNEL_URL = `https://api.thingspeak.com/channels/3097988/feeds.json?api_key=${THINGSPEAK_API_KEY}&results=1`;
 
   // Fetch sensor data from ThingSpeak
   useEffect(() => {
@@ -69,16 +80,54 @@ const Dashboard = () => {
         
         if (data.feeds && data.feeds.length > 0) {
           const latestFeed = data.feeds[0];
+          const mq2Value = parseFloat(latestFeed.field2) || sensorData.mq2;
+          const irValue = parseInt(latestFeed.field1) || sensorData.irSensor.detections;
           
           setSensorData(prev => ({
             ...prev,
-            mq2: parseFloat(latestFeed.field1) || prev.mq2,
+            mq2: mq2Value,
             irSensor: {
-              detections: parseInt(latestFeed.field2) || prev.irSensor.detections,
-              lastDetection: latestFeed.field2 > 0 ? "Just now" : prev.irSensor.lastDetection,
-              active: parseInt(latestFeed.field2) > 0
+              detections: irValue,
+              lastDetection: irValue > 0 ? "Just now" : prev.irSensor.lastDetection,
+              active: irValue > 0
             }
           }));
+
+          // Generate alerts based on sensor values
+          const newAlerts: typeof alerts = [];
+          const timestamp = new Date().toLocaleTimeString();
+
+          // MQ2 alert
+          if (mq2Value > 200) {
+            newAlerts.push({
+              id: `mq2-${Date.now()}`,
+              type: 'critical',
+              sensor: 'MQ-2 Gas Sensor',
+              message: `⚠ High gas level detected: ${mq2Value} PPM - DANGER!`,
+              timestamp
+            });
+            toast.error(`⚠ DANGER: High gas level detected (${mq2Value} PPM)`, {
+              duration: 5000
+            });
+          }
+
+          // IR sensor alert
+          if (irValue > 0) {
+            newAlerts.push({
+              id: `ir-${Date.now()}`,
+              type: 'critical',
+              sensor: 'IR Proximity Sensor',
+              message: `⚠ Crack Detected! Total detections: ${irValue}`,
+              timestamp
+            });
+            toast.error('⚠ Crack Detected!', {
+              duration: 5000
+            });
+          }
+
+          if (newAlerts.length > 0) {
+            setAlerts(prev => [...newAlerts, ...prev].slice(0, 10));
+          }
         }
       } catch (error) {
         console.error("Error fetching ThingSpeak data:", error);
@@ -418,6 +467,15 @@ const Dashboard = () => {
                     </div>
                   </div>
 
+                  {sensorData.irSensor.detections > 0 && (
+                    <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/20 border border-destructive/50 animate-pulse">
+                      <AlertTriangle className="w-4 h-4 text-destructive" />
+                      <span className="text-sm font-semibold text-destructive">
+                        ⚠ Crack Detected!
+                      </span>
+                    </div>
+                  )}
+
                   <div className="flex items-center gap-2 p-3 rounded-lg bg-accent/10 border border-accent/20">
                     <Waves className="w-4 h-4 text-accent" />
                     <span className="text-xs text-muted-foreground">
@@ -505,11 +563,16 @@ const Dashboard = () => {
                       <Flame className="w-4 h-4 text-orange-500 animate-pulse" />
                       <span className="text-sm font-semibold">MQ-2 (Flammable Gas)</span>
                     </div>
-                    <span className={`text-xs px-2 py-1 rounded transition-colors ${
-                      sensorData.mq2 < 200 ? 'bg-success/20 text-success' : 'bg-warning/20 text-warning'
-                    }`}>
-                      {sensorData.mq2 < 200 ? 'Safe' : 'Alert'}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      {sensorData.mq2 > 200 ? (
+                        <ShieldAlert className="w-4 h-4 text-destructive animate-pulse" />
+                      ) : null}
+                      <span className={`text-xs px-2 py-1 rounded font-semibold transition-colors ${
+                        sensorData.mq2 > 200 ? 'bg-destructive/20 text-destructive' : 'bg-success/20 text-success'
+                      }`}>
+                        {sensorData.mq2 > 200 ? 'Danger' : 'Safe'}
+                      </span>
+                    </div>
                   </div>
                   <p className="text-2xl font-bold text-orange-500">{sensorData.mq2} <span className="text-sm text-muted-foreground">PPM</span></p>
                 </div>
@@ -566,6 +629,61 @@ const Dashboard = () => {
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   All safety systems operational. Commands are enabled.
                 </p>
+              </div>
+            </Card>
+
+            {/* Alerts & Notifications Panel */}
+            <Card className="glass-card p-6 space-y-4 animate-fade-in-up" style={{ animationDelay: "0.35s" }}>
+              <h2 className="text-xl font-semibold flex items-center gap-2">
+                <ShieldAlert className="w-5 h-5 text-warning" />
+                Alerts & Notifications
+              </h2>
+
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                {alerts.length === 0 ? (
+                  <div className="text-center py-8 space-y-2">
+                    <CheckCircle className="w-8 h-8 mx-auto text-success" />
+                    <p className="text-sm text-muted-foreground">
+                      All systems normal
+                    </p>
+                  </div>
+                ) : (
+                  alerts.map((alert) => (
+                    <div
+                      key={alert.id}
+                      className={`p-3 rounded-lg border text-sm transition-all hover:scale-[1.02] ${
+                        alert.type === 'critical'
+                          ? "bg-destructive/10 border-destructive/30"
+                          : alert.type === 'caution'
+                          ? "bg-warning/10 border-warning/30"
+                          : "bg-success/10 border-success/30"
+                      }`}
+                    >
+                      <div className="flex items-start gap-2">
+                        {alert.type === 'critical' ? (
+                          <AlertTriangle className="w-4 h-4 text-destructive mt-0.5 animate-pulse" />
+                        ) : alert.type === 'caution' ? (
+                          <Info className="w-4 h-4 text-warning mt-0.5" />
+                        ) : (
+                          <CheckCircle className="w-4 h-4 text-success mt-0.5" />
+                        )}
+                        <div className="flex-1 space-y-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className={`font-semibold ${
+                              alert.type === 'critical' ? 'text-destructive' :
+                              alert.type === 'caution' ? 'text-warning' :
+                              'text-success'
+                            }`}>
+                              {alert.sensor}
+                            </span>
+                            <span className="text-xs text-muted-foreground">{alert.timestamp}</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground">{alert.message}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </Card>
 
