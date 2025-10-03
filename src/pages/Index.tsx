@@ -3,6 +3,7 @@ import { Features } from "@/components/Features";
 import { Story } from "@/components/Story";
 import { Applications } from "@/components/Applications";
 import { Evolution } from "@/components/Evolution";
+import { Uniqueness } from "@/components/Uniqueness";
 import Future from "@/components/Future";
 import prototypeImage from "@/assets/prototype.jpg";
 
@@ -45,6 +46,8 @@ const Index = () => {
       <Applications />
       <Evolution />
       <Future />
+      
+      <Uniqueness />
 
       {/* Demo/Media section */}
       <section className="py-20 relative">
@@ -57,9 +60,9 @@ const Index = () => {
 
           <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {/* Video Demo 1 */}
-            <div className="glass-card rounded-xl overflow-hidden animate-fade-in-up">
+            <div className="glass-card rounded-xl overflow-hidden animate-fade-in-up h-full">
               <iframe
-                className="w-full aspect-video"
+                className="w-full h-full min-h-[300px]"
                 src="https://www.youtube.com/embed/f2IuJB1TeoM"
                 title="S4V-WallBot Demo Video 1"
                 frameBorder="0"
@@ -69,9 +72,9 @@ const Index = () => {
             </div>
 
             {/* Video Demo 2 */}
-            <div className="glass-card rounded-xl overflow-hidden animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
+            <div className="glass-card rounded-xl overflow-hidden animate-fade-in-up h-full" style={{ animationDelay: "0.1s" }}>
               <iframe
-                className="w-full aspect-video"
+                className="w-full h-full min-h-[300px]"
                 src="https://www.youtube.com/embed/lLUNttXNDd4"
                 title="S4V-WallBot Demo Video 2"
                 frameBorder="0"
@@ -81,11 +84,11 @@ const Index = () => {
             </div>
 
             {/* Prototype Image */}
-            <div className="glass-card rounded-xl overflow-hidden animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
+            <div className="glass-card rounded-xl overflow-hidden animate-fade-in-up h-full" style={{ animationDelay: "0.2s" }}>
               <img
                 src={prototypeImage}
                 alt="S4V-WallBot Prototype"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover min-h-[300px]"
               />
             </div>
           </div>

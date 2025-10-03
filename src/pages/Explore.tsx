@@ -1,7 +1,13 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Box, Download } from "lucide-react";
+import { Box, Download, ZoomIn, ZoomOut } from "lucide-react";
 import { useState } from "react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import prototypeImg from "@/assets/stage-prototype.png";
+import esp32Img from "@/assets/stage-esp32.png";
+import tinymlImg from "@/assets/stage-tinyml.png";
+import safetyImg from "@/assets/stage-safety.png";
+import productionImg from "@/assets/stage-production.png";
 
 const models = [
   {
@@ -9,40 +15,49 @@ const models = [
     name: "Prototype Model",
     stage: "Stage 1",
     description: "Initial concept with basic suction mechanism",
-    notes: "First functional prototype demonstrating wall adhesion principles"
+    notes: "First functional prototype demonstrating wall adhesion principles",
+    image: prototypeImg
   },
   {
     id: "stage2",
     name: "ESP32-CAM Integration",
     stage: "Stage 2",
     description: "Added camera module and WiFi streaming",
-    notes: "Real-time video feed enables remote monitoring capability"
+    notes: "Real-time video feed enables remote monitoring capability",
+    image: esp32Img
   },
   {
     id: "stage3",
     name: "TinyML Version",
     stage: "Stage 3",
     description: "Integrated edge AI for defect detection",
-    notes: "Onboard neural network provides instant crack identification"
+    notes: "Onboard neural network provides instant crack identification",
+    image: tinymlImg
   },
   {
     id: "stage4",
     name: "Safety Enhanced",
     stage: "Stage 4",
     description: "Added comprehensive safety systems",
-    notes: "Edge detection, tether monitoring, and emergency stop features"
+    notes: "Edge detection, tether monitoring, and emergency stop features",
+    image: safetyImg
   },
   {
     id: "current",
     name: "Current Production",
     stage: "Current",
     description: "Full-featured autonomous inspection platform",
-    notes: "Complete IoT integration with OTA updates and dashboard control"
+    notes: "Complete IoT integration with OTA updates and dashboard control",
+    image: productionImg
   }
 ];
 
 const Explore = () => {
   const [selectedModel, setSelectedModel] = useState<string>("prototype");
+  const [zoom, setZoom] = useState(100);
+  const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
+
+  const currentModel = models.find(m => m.id === selectedModel);
 
   return (
     <div className="min-h-screen py-20">
@@ -58,53 +73,74 @@ const Explore = () => {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          {/* 3D Viewer */}
+          {/* Image Viewer */}
           <div className="lg:col-span-2">
             <Card className="glass-card p-8 space-y-6 animate-fade-in-up">
-              <div className="aspect-video bg-muted/30 rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-4">
-                <Box className="w-16 h-16 text-muted-foreground" />
-                <div className="text-center space-y-2">
-                  <p className="text-lg font-semibold text-foreground">3D Model Viewer</p>
-                  <p className="text-sm text-muted-foreground max-w-md">
-                    Insert 3D model links here (glTF/GLB format)
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Host models on CORS-enabled storage (S3, Netlify, etc.)
-                  </p>
-                </div>
+              <div className="relative aspect-video bg-muted/30 rounded-xl border-2 border-border overflow-hidden flex items-center justify-center">
+                {currentModel?.image ? (
+                  <img 
+                    src={currentModel.image} 
+                    alt={currentModel.name}
+                    style={{ transform: `scale(${zoom / 100})`, transition: 'transform 0.3s ease' }}
+                    className="max-w-full max-h-full object-contain cursor-zoom-in"
+                    onClick={() => setFullscreenImage(currentModel.image)}
+                  />
+                ) : (
+                  <div className="flex flex-col items-center gap-4">
+                    <Box className="w-16 h-16 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">No image available</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Zoom controls */}
+              <div className="flex items-center justify-center gap-4">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setZoom(Math.max(50, zoom - 25))}
+                  disabled={zoom <= 50}
+                >
+                  <ZoomOut className="w-4 h-4" />
+                </Button>
+                <span className="text-sm text-muted-foreground min-w-[60px] text-center">{zoom}%</span>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setZoom(Math.min(200, zoom + 25))}
+                  disabled={zoom >= 200}
+                >
+                  <ZoomIn className="w-4 h-4" />
+                </Button>
               </div>
 
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="text-xl font-semibold">
-                      {models.find(m => m.id === selectedModel)?.name}
+                      {currentModel?.name}
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      {models.find(m => m.id === selectedModel)?.stage}
+                      {currentModel?.stage}
                     </p>
                   </div>
-                  <Button variant="outline" size="sm">
-                    <Download className="w-4 h-4 mr-2" />
-                    Download Model
-                  </Button>
                 </div>
 
                 <p className="text-muted-foreground leading-relaxed">
-                  {models.find(m => m.id === selectedModel)?.description}
+                  {currentModel?.description}
                 </p>
 
                 <div className="bg-primary/10 border border-primary/30 rounded-lg p-4">
                   <p className="text-sm text-foreground">
                     <span className="font-semibold">Technical Note:</span>{" "}
-                    {models.find(m => m.id === selectedModel)?.notes}
+                    {currentModel?.notes}
                   </p>
                 </div>
               </div>
 
               <div className="pt-4 border-t border-border">
                 <p className="text-xs text-muted-foreground">
-                  <strong>Controls:</strong> Click and drag to rotate · Scroll to zoom · Right-click to pan
+                  <strong>Controls:</strong> Use zoom buttons to adjust view · Click image for fullscreen
                 </p>
               </div>
             </Card>
@@ -142,20 +178,18 @@ const Explore = () => {
           </div>
         </div>
 
-        {/* Instructions */}
-        <div className="mt-12 max-w-3xl mx-auto">
-          <Card className="glass-card p-6 space-y-4">
-            <h3 className="text-lg font-semibold">Setup Instructions</h3>
-            <ol className="space-y-2 text-sm text-muted-foreground list-decimal list-inside">
-              <li>Export your 3D models as glTF or GLB format</li>
-              <li>Upload to a CORS-enabled storage service (AWS S3, Netlify, etc.)</li>
-              <li>Configure CORS headers to allow your domain</li>
-              <li>Replace the model URLs in the code with your hosted URLs</li>
-              <li>Consider using model-viewer web component or three.js for rendering</li>
-            </ol>
-          </Card>
-        </div>
       </div>
+
+      {/* Fullscreen Image Dialog */}
+      <Dialog open={!!fullscreenImage} onOpenChange={() => setFullscreenImage(null)}>
+        <DialogContent className="max-w-[90vw] max-h-[90vh] p-0">
+          <img 
+            src={fullscreenImage || ""} 
+            alt="Fullscreen view"
+            className="w-full h-full object-contain"
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
